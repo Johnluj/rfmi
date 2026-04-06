@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reviving Fire Ministries Int'l</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            fire: { 50:'#fff7ed', 100:'#ffedd5', 200:'#fed7aa', 300:'#fdba74', 400:'#fb923c', 500:'#f97316', 600:'#ea580c', 700:'#c2410c', 800:'#9a3412', 900:'#7c2d12' },
+            ember: { DEFAULT:'#e85d04', light:'#f48c06', dark:'#9d0208' },
+            gold: { DEFAULT:'#d4a017', light:'#f0c040', dim:'#a07810' },
+            smoke: { 50:'#f8f7f4', 100:'#ede9e0', 200:'#d5cdbf', 300:'#b8ad9d', 400:'#998c7c', 500:'#7d7063', 600:'#63574c', 700:'#4d4339', 800:'#332d26', 900:'#1a1612' },
+            deep: { DEFAULT:'#0d0b08', mid:'#1a1410', light:'#251e16' }
+          },
+          fontFamily: {
+            display: ['Cinzel Decorative', 'serif'],
+            heading: ['Cinzel', 'serif'],
+            body: ['EB Garamond', 'Georgia', 'serif'],
+            sans: ['Montserrat', 'sans-serif'],
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.8s ease forwards',
+            'fade-in': 'fadeIn 1s ease forwards',
+            'flicker': 'flicker 3s ease-in-out infinite',
+            'ember-rise': 'emberRise 4s ease-in-out infinite',
+            'glow-pulse': 'glowPulse 2.5s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp: { '0%':{ opacity:'0', transform:'translateY(40px)' }, '100%':{ opacity:'1', transform:'translateY(0)' } },
+            fadeIn: { '0%':{ opacity:'0' }, '100%':{ opacity:'1' } },
+            flicker: { '0%,100%':{ opacity:'1' }, '25%':{ opacity:'0.92' }, '50%':{ opacity:'0.97' }, '75%':{ opacity:'0.88' } },
+            emberRise: { '0%':{ transform:'translateY(0) scale(1)', opacity:'0.7' }, '50%':{ transform:'translateY(-30px) scale(1.1)', opacity:'1' }, '100%':{ transform:'translateY(0) scale(1)', opacity:'0.7' } },
+            glowPulse: { '0%,100%':{ boxShadow:'0 0 20px rgba(232,93,4,0.4)' }, '50%':{ boxShadow:'0 0 50px rgba(232,93,4,0.8), 0 0 80px rgba(244,140,6,0.4)' } }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0d0b08;
+      color: #ede9e0;
+      font-family: 'EB Garamond', Georgia, serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── Page Transitions ─── */
+    .page { display: none; opacity: 0; transition: opacity 0.5s ease; }
+    .page.active { display: block; animation: pageReveal 0.6s ease forwards; }
+    @keyframes pageReveal { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0d0b08; }
+    ::-webkit-scrollbar-thumb { background: #e85d04; border-radius: 3px; }
+
+    /* ─── Fire Canvas ─── */
+    #fire-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.12; }
+
+    /* ─── Noise overlay ─── */
+    .noise::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.3;
+      mix-blend-mode: overlay;
+    }
+
+    /* ─── Glow text ─── */
+    .glow-text { text-shadow: 0 0 30px rgba(232,93,4,0.6), 0 0 60px rgba(232,93,4,0.3); }
+    .gold-glow { text-shadow: 0 0 20px rgba(212,160,23,0.7), 0 0 40px rgba(212,160,23,0.3); }
+
+    /* ─── Divider ─── */
+    .fire-divider {
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .fire-divider::before, .fire-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, #e85d04, transparent);
+    }
+
+    /* ─── Animate on scroll ─── */
+    .aos { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .aos.visible { opacity: 1; transform: translateY(0); }
+    .aos-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .aos-left.visible { opacity: 1; transform: translateX(0); }
+    .aos-right { opacity: 0; transform: translateX(50px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .aos-right.visible { opacity: 1; transform: translateX(0); }
+    .aos-scale { opacity: 0; transform: scale(0.85); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .aos-scale.visible { opacity: 1; transform: scale(1); }
+
+    /* ─── Nav ─── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: all 0.3s ease; }
+    nav.scrolled { background: rgba(13,11,8,0.97); box-shadow: 0 2px 30px rgba(232,93,4,0.2); backdrop-filter: blur(12px); }
+    .nav-link {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: #b8ad9d;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+      position: relative;
+      padding-bottom: 4px;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 1px;
+      background: #e85d04;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover, .nav-link.active { color: #f48c06; }
+    .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+    /* ─── Hero ─── */
+    .hero-bg {
+      background: radial-gradient(ellipse at 50% 80%, rgba(232,93,4,0.25) 0%, rgba(156,61,0,0.12) 40%, transparent 70%),
+                  radial-gradient(ellipse at 20% 50%, rgba(212,160,23,0.08) 0%, transparent 50%),
+                  linear-gradient(180deg, #0d0b08 0%, #1a0d05 50%, #0d0b08 100%);
+    }
+
+    /* ─── Cards ─── */
+    .fire-card {
+      background: linear-gradient(135deg, rgba(36,26,16,0.9), rgba(20,14,8,0.95));
+      border: 1px solid rgba(232,93,4,0.15);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .fire-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 110%, rgba(232,93,4,0.12) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .fire-card:hover::before { opacity: 1; }
+    .fire-card:hover { border-color: rgba(232,93,4,0.4); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(232,93,4,0.15); }
+
+    /* ─── CTA Button ─── */
+    .btn-fire {
+      background: linear-gradient(135deg, #e85d04, #c2410c);
+      color: #fff7ed;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.5rem;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+    .btn-fire::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .btn-fire:hover { box-shadow: 0 0 30px rgba(232,93,4,0.6), 0 0 60px rgba(232,93,4,0.2); transform: translateY(-2px); }
+    .btn-fire:hover::after { opacity: 1; }
+
+    .btn-outline {
+      background: transparent;
+      color: #f48c06;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.85rem 2.2rem;
+      border: 1px solid rgba(232,93,4,0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    }
+    .btn-outline:hover { background: rgba(232,93,4,0.1); border-color: #e85d04; box-shadow: 0 0 20px rgba(232,93,4,0.3); }
+
+    /* ─── Section headers ─── */
+    .section-tag {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #e85d04;
+    }
+
+    /* ─── Blog cards ─── */
+    .blog-card { cursor: pointer; }
+    .blog-card:hover .blog-title { color: #f48c06; }
+
+    /* ─── Give page ─── */
+    .account-card {
+      background: linear-gradient(135deg, rgba(232,93,4,0.08), rgba(13,11,8,0.9));
+      border: 1px solid rgba(232,93,4,0.2);
+    }
+
+    /* ─── Mobile menu ─── */
+    #mobile-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+    #mobile-menu.open { transform: translateX(0); }
+
+    /* ─── Ember particles ─── */
+    .ember {
+      position: absolute;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #f48c06;
+      pointer-events: none;
+      animation: floatEmber linear infinite;
+    }
+    @keyframes floatEmber {
+      0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
+      50% { transform: translateY(-200px) translateX(var(--drift)) scale(0.6); opacity: 0.5; }
+      100% { transform: translateY(-400px) translateX(calc(var(--drift) * 2)) scale(0.1); opacity: 0; }
+    }
+
+    /* ─── Testimony ─── */
+    .testimony-slider { overflow: hidden; }
+
+    /* ─── Gallery grid ─── */
+    .gallery-item {
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+    .gallery-item img { transition: transform 0.6s ease; }
+    .gallery-item:hover img { transform: scale(1.08); }
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,11,8,0.85), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      display: flex; align-items: flex-end;
+      padding: 1.5rem;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    /* form */
+    .form-input {
+      background: rgba(36,26,16,0.8);
+      border: 1px solid rgba(232,93,4,0.2);
+      color: #ede9e0;
+      font-family: 'EB Garamond', serif;
+      font-size: 1.05rem;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+    }
+    .form-input:focus { border-color: rgba(232,93,4,0.6); box-shadow: 0 0 15px rgba(232,93,4,0.15); }
+    .form-input::placeholder { color: #63574c; }
+
+    /* ─── Flame SVG animation ─── */
+    .flame-icon { animation: flicker 2s ease-in-out infinite alternate; }
+
+    /* ─── Quote block ─── */
+    .scripture-quote {
+      border-left: 3px solid #e85d04;
+      padding-left: 1.5rem;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: #d5cdbf;
+      line-height: 1.8;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      background: linear-gradient(180deg, #0d0b08, #080604);
+      border-top: 1px solid rgba(232,93,4,0.15);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fire canvas background -->
+<canvas id="fire-canvas"></canvas>
+
+<!-- ══════════════════ NAVIGATION ══════════════════ -->
+<nav id="navbar">
+  <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <!-- Logo -->
+    <button onclick="showPage('home')" class="flex items-center gap-3 group">
+      <div class="relative w-10 h-10">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 flame-icon">
+          <path d="M20 38C20 38 6 28 6 18C6 10 12 4 20 4C20 4 16 10 20 14C24 10 26 6 26 6C26 6 34 12 34 20C34 30 20 38 20 38Z" fill="url(#fire-grad)" opacity="0.9"/>
+          <path d="M20 34C20 34 12 26 12 20C12 16 16 12 20 12C20 12 18 16 20 18C22 16 24 14 24 14C24 14 28 18 28 22C28 28 20 34 20 34Z" fill="url(#inner-grad)" opacity="0.8"/>
+          <defs>
+            <linearGradient id="fire-grad" x1="20" y1="4" x2="20" y2="38" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#f48c06"/>
+              <stop offset="0.5" stop-color="#e85d04"/>
+              <stop offset="1" stop-color="#9d0208"/>
+            </linearGradient>
+            <linearGradient id="inner-grad" x1="20" y1="12" x2="20" y2="34" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#fde68a"/>
+              <stop offset="1" stop-color="#f48c06"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div>
+        <div class="font-display text-xs text-ember-light tracking-widest leading-none">Reviving Fire</div>
+        <div class="font-sans text-[0.6rem] text-smoke-400 tracking-[0.2em] uppercase">Ministries Int'l</div>
+      </div>
+    </button>
+
+    <!-- Desktop links -->
+    <div class="hidden lg:flex items-center gap-8">
+      <button onclick="showPage('home')" class="nav-link active" id="nav-home">Home</button>
+      <button onclick="showPage('about')" class="nav-link" id="nav-about">About Us</button>
+      <button onclick="showPage('noe')" class="nav-link" id="nav-noe">Night of Encounters</button>
+      <button onclick="showPage('blog')" class="nav-link" id="nav-blog">Blog</button>
+      <button onclick="showPage('contact')" class="nav-link" id="nav-contact">Contact Us</button>
+      <button onclick="showPage('give')" class="btn-fire text-xs">Give</button>
+    </div>
+
+    <!-- Mobile hamburger -->
+    <button id="menu-toggle" onclick="toggleMenu()" class="lg:hidden flex flex-col gap-1.5 p-2">
+      <span class="w-6 h-0.5 bg-ember-light transition-all" id="bar1"></span>
+      <span class="w-6 h-0.5 bg-ember-light transition-all" id="bar2"></span>
+      <span class="w-4 h-0.5 bg-ember-light transition-all" id="bar3"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" class="fixed inset-y-0 right-0 w-72 z-50 bg-deep-mid border-l border-ember/20 p-8 pt-20 flex flex-col gap-6">
+  <button onclick="closeMobileMenu(); showPage('home')" class="nav-link text-left text-base">Home</button>
+  <button onclick="closeMobileMenu(); showPage('about')" class="nav-link text-left text-base">About Us</button>
+  <button onclick="closeMobileMenu(); showPage('noe')" class="nav-link text-left text-base">Night of Encounters</button>
+  <button onclick="closeMobileMenu(); showPage('blog')" class="nav-link text-left text-base">Blog</button>
+  <button onclick="closeMobileMenu(); showPage('contact')" class="nav-link text-left text-base">Contact Us</button>
+  <button onclick="closeMobileMenu(); showPage('give')" class="btn-fire mt-4">Give</button>
+</div>
+<div id="menu-overlay" onclick="closeMobileMenu()" class="fixed inset-0 z-40 bg-black/60 hidden"></div>
+
+
+<!-- ══════════════════ HOME PAGE ══════════════════ -->
+<section id="page-home" class="page active">
+
+  <!-- Hero -->
+  <div class="hero-bg relative min-h-screen flex items-center justify-center overflow-hidden noise pt-24">
+    <!-- Ember particles container -->
+    <div id="ember-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- Decorative ring -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div class="w-[600px] h-[600px] rounded-full border border-ember/10 opacity-40 animate-[spin_30s_linear_infinite]"></div>
+      <div class="absolute w-[400px] h-[400px] rounded-full border border-gold/10 opacity-30 animate-[spin_20s_linear_infinite_reverse]"></div>
+    </div>
+
+    <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+      <!-- Eyebrow -->
+      <div class="section-tag mb-6 animate-[fadeUp_0.6s_ease_forwards]">Rekindling Hearts · Revealing His Glory</div>
+
+      <!-- Title -->
+      <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-ember-light leading-tight mb-2 glow-text animate-[fadeUp_0.8s_ease_0.2s_both]">
+        Reviving Fire
+      </h1>
+      <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gold-light leading-tight mb-8 gold-glow animate-[fadeUp_0.8s_ease_0.3s_both]">
+        Ministries Int'l
+      </h1>
+
+      <!-- Scripture -->
+      <p class="font-body text-lg sm:text-xl text-smoke-200 italic leading-relaxed mb-4 max-w-2xl mx-auto animate-[fadeUp_0.8s_ease_0.4s_both]">
+        "Will You not revive us again, that Your people may rejoice in You?"
+      </p>
+      <p class="font-sans text-xs tracking-widest text-ember uppercase mb-10 animate-[fadeUp_0.8s_ease_0.5s_both]">— Psalm 85:6</p>
+
+      <!-- Mission statement -->
+      <p class="font-body text-base sm:text-lg text-smoke-300 leading-relaxed max-w-2xl mx-auto mb-12 animate-[fadeUp_0.8s_ease_0.55s_both]">
+        Our mission is to ignite revival across nations, turning hearts back to God through the transformative power of the Holy Spirit.
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center animate-[fadeUp_0.8s_ease_0.6s_both]">
+        <button onclick="showPage('noe')" class="btn-fire">Upcoming Events</button>
+        <button onclick="showPage('about')" class="btn-outline">Our Story</button>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+      <div class="w-px h-12 bg-gradient-to-b from-ember to-transparent"></div>
+      <span class="font-sans text-[0.6rem] text-smoke-500 tracking-widest uppercase">Scroll</span>
+    </div>
+  </div>
+
+  <!-- Who We Are strip -->
+  <div class="relative z-10 bg-deep-light py-20 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="fire-divider mb-16">
+        <span class="section-tag">Who We Are</span>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="fire-card rounded-none p-8 aos" style="transition-delay:0.1s">
+          <div class="text-ember text-4xl mb-4 font-display">🔥</div>
+          <h3 class="font-heading text-lg text-smoke-50 mb-3 tracking-wide">Revival Fire</h3>
+          <p class="font-body text-smoke-400 leading-relaxed text-base">We carry the transformative fire of the Holy Spirit to campuses, communities, and nations, igniting hearts for God.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="fire-card rounded-none p-8 aos" style="transition-delay:0.2s">
+          <div class="text-ember text-4xl mb-4 font-display">✝️</div>
+          <h3 class="font-heading text-lg text-smoke-50 mb-3 tracking-wide">Divine Encounters</h3>
+          <p class="font-body text-smoke-400 leading-relaxed text-base">Through worship, the Word, and prayer, we create atmospheres for genuine encounters that transform lives from the inside out.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="fire-card rounded-none p-8 aos" style="transition-delay:0.3s">
+          <div class="text-ember text-4xl mb-4 font-display">🌍</div>
+          <h3 class="font-heading text-lg text-smoke-50 mb-3 tracking-wide">Global Impact</h3>
+          <p class="font-body text-smoke-400 leading-relaxed text-base">From Ibadan to the ends of the earth — our reach grows with every Night of Encounter, bringing lasting transformation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Night of Encounters Banner -->
+  <div class="relative py-24 px-6 overflow-hidden" style="background: linear-gradient(135deg, #1a0d05 0%, #0d0b08 50%, #120800 100%);">
+    <div class="absolute inset-0 opacity-20" style="background: radial-gradient(ellipse at 30% 50%, rgba(232,93,4,0.4), transparent 60%)"></div>
+    <div class="max-w-5xl mx-auto relative z-10">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="aos-left">
+          <div class="section-tag mb-4">Flagship Program</div>
+          <h2 class="font-display text-3xl sm:text-4xl text-ember-light glow-text mb-6 leading-tight">Night of Encounters</h2>
+          <p class="font-body text-smoke-300 text-lg leading-relaxed mb-4">
+            Our signature program brings the message of revival to various territories — especially campuses — creating an atmosphere for divine encounters through worship, word, and prayer.
+          </p>
+          <p class="font-body text-smoke-400 text-base leading-relaxed mb-8">
+            Join us as we spread across communities, encouraging personal and communal transformation.
+          </p>
+          <button onclick="showPage('noe')" class="btn-fire">View Upcoming Events</button>
+        </div>
+
+        <div class="aos-right">
+          <!-- Upcoming events mini list -->
+          <div class="space-y-4">
+            <div class="fire-card p-5 flex items-center gap-4">
+              <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-ember/20 rounded-full">
+                <span class="text-ember font-heading text-sm font-bold">28</span>
+              </div>
+              <div>
+                <div class="font-sans text-[0.6rem] text-ember tracking-widest uppercase mb-1">November 2025</div>
+                <div class="font-heading text-smoke-100 text-sm">Night of Encounters — Ayete</div>
+              </div>
+            </div>
+            <div class="fire-card p-5 flex items-center gap-4">
+              <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-ember/20 rounded-full">
+                <span class="text-ember font-heading text-sm font-bold">TBA</span>
+              </div>
+              <div>
+                <div class="font-sans text-[0.6rem] text-ember tracking-widest uppercase mb-1">Coming Soon</div>
+                <div class="font-heading text-smoke-100 text-sm">Night of Encounters — Eruwa</div>
+              </div>
+            </div>
+            <div class="fire-card p-5 flex items-center gap-4">
+              <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-ember/20 rounded-full">
+                <span class="text-ember font-heading text-sm font-bold">TBA</span>
+              </div>
+              <div>
+                <div class="font-sans text-[0.6rem] text-ember tracking-widest uppercase mb-1">Coming Soon</div>
+                <div class="font-heading text-smoke-100 text-sm">Night of Encounters — Ibadan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <div class="py-24 px-6 bg-deep-DEFAULT">
+    <div class="max-w-6xl mx-auto">
+      <div class="fire-divider mb-4">
+        <span class="section-tag">Gallery</span>
+      </div>
+      <h2 class="font-display text-2xl sm:text-3xl text-center text-smoke-100 mb-14 aos">Glimpses of Revival</h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="gallery-item col-span-2 h-64 md:h-80 bg-gradient-to-br from-smoke-800 to-deep-DEFAULT rounded-sm aos">
+          <div class="w-full h-full flex items-end justify-start p-4" style="background: linear-gradient(135deg, rgba(232,93,4,0.15), rgba(13,11,8,0.9)), url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80') center/cover">
+            <div class="gallery-overlay"></div>
+            <span class="font-heading text-smoke-100 text-sm z-10 relative">Night of Encounters 2024</span>
+          </div>
+        </div>
+        <div class="gallery-item h-64 md:h-80 bg-deep-DEFAULT rounded-sm aos" style="transition-delay:0.1s">
+          <div class="w-full h-full flex items-end p-4" style="background: linear-gradient(135deg, rgba(156,61,0,0.2), rgba(13,11,8,0.85)), url('https://images.unsplash.com/photo-1519491050282-cf00c82424cf?w=600&q=80') center/cover">
+            <span class="font-heading text-smoke-100 text-sm z-10 relative">Night of Encounters 2025</span>
+          </div>
+        </div>
+        <div class="gallery-item h-48 md:h-56 bg-deep-DEFAULT rounded-sm aos" style="transition-delay:0.2s">
+          <div class="w-full h-full flex items-end p-4" style="background: linear-gradient(to top, rgba(13,11,8,0.85), transparent), url('https://images.unsplash.com/photo-1455849318743-b2233052fcff?w=600&q=80') center/cover">
+            <span class="font-heading text-smoke-100 text-sm z-10 relative">Night of Encounters Eruwa</span>
+          </div>
+        </div>
+        <div class="gallery-item col-span-2 h-48 md:h-56 bg-deep-DEFAULT rounded-sm aos" style="transition-delay:0.3s">
+          <div class="w-full h-full flex items-end p-4" style="background: linear-gradient(to top, rgba(13,11,8,0.85), transparent), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=800&q=80') center/cover">
+            <span class="font-heading text-smoke-100 text-sm z-10 relative">Community Outreach</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimony strip -->
+  <div class="py-20 px-6 relative overflow-hidden" style="background:linear-gradient(135deg,#120800,#0d0b08)">
+    <div class="max-w-3xl mx-auto text-center">
+      <div class="section-tag mb-6 aos">Testimonies</div>
+      <div id="testimony-box" class="aos">
+        <div class="scripture-quote text-smoke-200 mb-6 font-body text-xl">
+          "The fire of God touched me at Night of Encounters Eruwa. My life has never been the same. I came broken, I left burning for Jesus."
+        </div>
+        <p class="font-sans text-ember text-xs tracking-widest uppercase">— Testimony, Eruwa 2024</p>
+      </div>
+      <div class="flex justify-center gap-2 mt-8">
+        <div class="w-8 h-0.5 bg-ember rounded-full"></div>
+        <div class="w-3 h-0.5 bg-smoke-700 rounded-full"></div>
+        <div class="w-3 h-0.5 bg-smoke-700 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partner CTA -->
+  <div class="py-24 px-6 bg-deep-light relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10" style="background: radial-gradient(ellipse at center, rgba(212,160,23,0.5), transparent 70%)"></div>
+    <div class="max-w-3xl mx-auto text-center relative z-10 aos">
+      <div class="section-tag mb-6">Join The Movement</div>
+      <h2 class="font-display text-3xl sm:text-4xl text-gold-light gold-glow mb-6">Partner With Us</h2>
+      <p class="font-body text-smoke-300 text-lg leading-relaxed mb-10">
+        Your generosity fuels revival. Every gift helps us organize Night of Encounter programs, produce media content, and equip individuals for ministry across the nations.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button onclick="showPage('give')" class="btn-fire">Give Today</button>
+        <button onclick="showPage('contact')" class="btn-outline">Get In Touch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <div class="font-display text-sm text-ember-light mb-1">Reviving Fire Ministries Int'l</div>
+          <div class="font-sans text-xs text-smoke-600 tracking-wider">Rekindling hearts, revealing His glory.</div>
+        </div>
+        <div class="flex gap-6">
+          <button onclick="showPage('home')" class="font-sans text-xs text-smoke-500 hover:text-ember transition-colors uppercase tracking-wider">Home</button>
+          <button onclick="showPage('about')" class="font-sans text-xs text-smoke-500 hover:text-ember transition-colors uppercase tracking-wider">About</button>
+          <button onclick="showPage('noe')" class="font-sans text-xs text-smoke-500 hover:text-ember transition-colors uppercase tracking-wider">Events</button>
+          <button onclick="showPage('contact')" class="font-sans text-xs text-smoke-500 hover:text-ember transition-colors uppercase tracking-wider">Contact</button>
+        </div>
+        <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+      </div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ ABOUT US ══════════════════ -->
+<section id="page-about" class="page">
+
+  <!-- Hero -->
+  <div class="relative pt-32 pb-20 px-6 overflow-hidden" style="background:linear-gradient(180deg,#1a0d05 0%,#0d0b08 100%)">
+    <div class="absolute inset-0 opacity-20" style="background:radial-gradient(ellipse at 60% 40%,rgba(232,93,4,0.5),transparent 60%)"></div>
+    <div class="max-w-4xl mx-auto relative z-10 text-center">
+      <div class="section-tag mb-6">Our Heart</div>
+      <h1 class="font-display text-4xl sm:text-5xl text-ember-light glow-text mb-8 leading-tight">About Us</h1>
+      <div class="scripture-quote max-w-2xl mx-auto text-smoke-300">
+        "True REVIVAL is birthed through a genuine Hunger."
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripture -->
+  <div class="py-16 px-6 bg-deep-mid">
+    <div class="max-w-3xl mx-auto text-center aos">
+      <p class="font-body text-xl text-smoke-200 italic leading-relaxed mb-4">
+        "O God, thou art my God; early will I seek thee: my soul thirsteth for thee, my flesh longeth for thee in a dry and thirsty land, where no water is; to see thy power and thy glory, so as I have seen thee in the sanctuary."
+      </p>
+      <span class="section-tag">Psalms 63:1–2</span>
+    </div>
+  </div>
+
+  <!-- Vision & Mission -->
+  <div class="py-20 px-6 bg-deep-DEFAULT">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 items-start">
+        <!-- Vision -->
+        <div class="fire-card p-10 rounded-none aos-left">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-1 h-16 bg-gradient-to-b from-ember to-transparent"></div>
+            <h2 class="font-display text-2xl text-ember-light glow-text">Our Vision</h2>
+          </div>
+          <p class="font-body text-smoke-300 text-lg leading-relaxed">
+            To see a global awakening where individuals experience a profound transformation, embracing a life centered on God.
+          </p>
+          <div class="mt-8 pt-6 border-t border-ember/10">
+            <div class="text-4xl text-ember opacity-20 font-display leading-none">"</div>
+            <p class="font-body italic text-smoke-400 text-base leading-relaxed -mt-2">
+              We exist to see whole nations turn back to the living God — one heart, one campus, one community at a time.
+            </p>
+          </div>
+        </div>
+        <!-- Mission -->
+        <div class="fire-card p-10 rounded-none aos-right">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-1 h-16 bg-gradient-to-b from-gold to-transparent"></div>
+            <h2 class="font-display text-2xl text-gold-light gold-glow">Our Mission</h2>
+          </div>
+          <ul class="space-y-5">
+            <li class="flex items-start gap-3">
+              <span class="w-5 h-5 flex-shrink-0 mt-1 text-ember">🔥</span>
+              <p class="font-body text-smoke-300 text-lg leading-relaxed">Carry the revival fire to every corner of the world.</p>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-5 h-5 flex-shrink-0 mt-1 text-ember">✨</span>
+              <p class="font-body text-smoke-300 text-lg leading-relaxed">Facilitate encounters that lead to genuine repentance and transformation.</p>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-5 h-5 flex-shrink-0 mt-1 text-ember">📖</span>
+              <p class="font-body text-smoke-300 text-lg leading-relaxed">Equip believers to live disciplined, godly lives in the digital age.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leadership -->
+  <div class="py-24 px-6" style="background:linear-gradient(180deg,#120800,#0d0b08)">
+    <div class="max-w-6xl mx-auto">
+      <div class="fire-divider mb-16">
+        <span class="section-tag">Our Leaders</span>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-10 max-w-3xl mx-auto">
+        <!-- Pastor 1 -->
+        <div class="text-center aos" style="transition-delay:0.1s">
+          <div class="relative w-44 h-44 mx-auto mb-6">
+            <div class="w-full h-full rounded-full overflow-hidden border-2 border-ember/30" style="background:linear-gradient(135deg,#3d1f08,#1a0d05)">
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="font-display text-4xl text-ember-light">TE</span>
+              </div>
+            </div>
+            <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-ember rounded-full flex items-center justify-center text-white text-sm animate-glow-pulse">🔥</div>
+          </div>
+          <h3 class="font-heading text-xl text-smoke-50 mb-2 tracking-wide">Pastor Tega Eduviere</h3>
+          <div class="section-tag mb-3">Founder & Lead Pastor</div>
+          <p class="font-body text-smoke-400 text-base leading-relaxed">Passionate about igniting revival and mentoring the next generation in the ways of God.</p>
+        </div>
+
+        <!-- Pastor 2 -->
+        <div class="text-center aos" style="transition-delay:0.2s">
+          <div class="relative w-44 h-44 mx-auto mb-6">
+            <div class="w-full h-full rounded-full overflow-hidden border-2 border-gold/30" style="background:linear-gradient(135deg,#3d2e08,#1a0d05)">
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="font-display text-4xl text-gold-light">CT</span>
+              </div>
+            </div>
+            <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gold rounded-full flex items-center justify-center text-white text-sm">✝️</div>
+          </div>
+          <h3 class="font-heading text-xl text-smoke-50 mb-2 tracking-wide">Pastor (Mrs) Chimamanda<br>Tega-Eduviere</h3>
+          <div class="section-tag mb-3">Co-Pastor</div>
+          <p class="font-body text-smoke-400 text-base leading-relaxed">Dedicated to nurturing spiritual growth and fostering godly character across the body of Christ.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="font-display text-sm text-ember-light mb-2">Reviving Fire Ministries Int'l</div>
+      <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ NIGHT OF ENCOUNTERS ══════════════════ -->
+<section id="page-noe" class="page">
+
+  <!-- Hero -->
+  <div class="relative pt-36 pb-24 px-6 text-center overflow-hidden" style="background:linear-gradient(180deg,#200e02 0%,#0d0b08 100%)">
+    <div class="absolute inset-0 opacity-30" style="background:radial-gradient(ellipse at 50% 30%,rgba(232,93,4,0.6),transparent 60%)"></div>
+    <!-- Decorative orbs -->
+    <div class="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-20" style="background:#e85d04"></div>
+    <div class="absolute top-40 right-10 w-24 h-24 rounded-full blur-3xl opacity-15" style="background:#f48c06"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto">
+      <div class="section-tag mb-6">Flagship Program</div>
+      <h1 class="font-display text-4xl sm:text-5xl md:text-6xl text-ember-light glow-text mb-6 leading-tight">Night of Encounters</h1>
+      <p class="font-body text-smoke-300 text-lg leading-relaxed">
+        Where heaven touches earth and lives are forever transformed.
+      </p>
+    </div>
+  </div>
+
+  <!-- What it is -->
+  <div class="py-20 px-6 bg-deep-DEFAULT">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="aos-left">
+          <div class="section-tag mb-4">What We Do</div>
+          <h2 class="font-display text-3xl text-smoke-50 mb-8 leading-tight">An Atmosphere for<br><span class="text-ember-light">Divine Encounter</span></h2>
+          <p class="font-body text-smoke-300 text-lg leading-relaxed mb-6">
+            Night of Encounter is our flagship program designed to bring the message of revival to various territories — especially campuses — creating an atmosphere for divine encounters through worship, word, and prayer.
+          </p>
+          <p class="font-body text-smoke-400 text-base leading-relaxed">
+            We encourage personal and communal transformation, calling people to a deeper, more authentic walk with God.
+          </p>
+        </div>
+
+        <!-- Pillars -->
+        <div class="space-y-4 aos-right">
+          <div class="fire-card p-6 flex items-center gap-5">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 flex items-center justify-center text-xl">🎵</div>
+            <div>
+              <h3 class="font-heading text-smoke-100 mb-1">Worship</h3>
+              <p class="font-body text-smoke-500 text-sm">Deep, spirit-led worship that ushers in the presence of God.</p>
+            </div>
+          </div>
+          <div class="fire-card p-6 flex items-center gap-5">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 flex items-center justify-center text-xl">📖</div>
+            <div>
+              <h3 class="font-heading text-smoke-100 mb-1">The Word</h3>
+              <p class="font-body text-smoke-500 text-sm">Uncompromising, transformative preaching of God's living Word.</p>
+            </div>
+          </div>
+          <div class="fire-card p-6 flex items-center gap-5">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 flex items-center justify-center text-xl">🙏</div>
+            <div>
+              <h3 class="font-heading text-smoke-100 mb-1">Prayer</h3>
+              <p class="font-body text-smoke-500 text-sm">Corporate intercession and prayer that releases heaven's agenda.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Events -->
+  <div class="py-24 px-6" style="background:linear-gradient(180deg,#120800,#0d0b08)">
+    <div class="max-w-4xl mx-auto">
+      <div class="fire-divider mb-4">
+        <span class="section-tag">Schedule</span>
+      </div>
+      <h2 class="font-display text-3xl text-center text-smoke-50 mb-16 aos">Upcoming Nights of Encounter</h2>
+
+      <div class="space-y-6">
+        <!-- Event 1 -->
+        <div class="fire-card p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 aos" style="transition-delay:0.1s">
+          <div class="flex-shrink-0 text-center w-20">
+            <div class="font-display text-4xl text-ember-light glow-text">28</div>
+            <div class="font-sans text-xs text-ember tracking-widest uppercase">Nov</div>
+            <div class="font-sans text-xs text-smoke-600 tracking-widest">2025</div>
+          </div>
+          <div class="w-px h-16 bg-ember/20 hidden sm:block"></div>
+          <div class="flex-1">
+            <div class="section-tag mb-2">Confirmed</div>
+            <h3 class="font-heading text-xl text-smoke-50 mb-2">Night of Encounters — Ayete</h3>
+            <p class="font-body text-smoke-500 text-base">Ayete, Oyo State · Come expecting a divine encounter that will change your life forever.</p>
+          </div>
+          <div class="flex-shrink-0">
+            <span class="inline-block px-4 py-1.5 bg-ember/20 text-ember font-sans text-xs tracking-widest uppercase rounded-sm border border-ember/30">Upcoming</span>
+          </div>
+        </div>
+
+        <!-- Event 2 -->
+        <div class="fire-card p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 aos" style="transition-delay:0.2s">
+          <div class="flex-shrink-0 text-center w-20">
+            <div class="font-display text-4xl text-smoke-600">TBA</div>
+            <div class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Date</div>
+          </div>
+          <div class="w-px h-16 bg-ember/20 hidden sm:block"></div>
+          <div class="flex-1">
+            <div class="font-sans text-[0.6rem] text-smoke-600 tracking-widest uppercase mb-2">Stay Tuned</div>
+            <h3 class="font-heading text-xl text-smoke-50 mb-2">Night of Encounters — Eruwa</h3>
+            <p class="font-body text-smoke-500 text-base">Eruwa, Oyo State · Date to be announced. Stay connected for updates.</p>
+          </div>
+          <div class="flex-shrink-0">
+            <span class="inline-block px-4 py-1.5 bg-smoke-800/40 text-smoke-500 font-sans text-xs tracking-widest uppercase rounded-sm border border-smoke-700">TBA</span>
+          </div>
+        </div>
+
+        <!-- Event 3 -->
+        <div class="fire-card p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 aos" style="transition-delay:0.3s">
+          <div class="flex-shrink-0 text-center w-20">
+            <div class="font-display text-4xl text-smoke-600">TBA</div>
+            <div class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Date</div>
+          </div>
+          <div class="w-px h-16 bg-ember/20 hidden sm:block"></div>
+          <div class="flex-1">
+            <div class="font-sans text-[0.6rem] text-smoke-600 tracking-widest uppercase mb-2">Stay Tuned</div>
+            <h3 class="font-heading text-xl text-smoke-50 mb-2">Night of Encounters — Ibadan</h3>
+            <p class="font-body text-smoke-500 text-base">Ibadan, Oyo State · Date to be announced. More locations coming soon!</p>
+          </div>
+          <div class="flex-shrink-0">
+            <span class="inline-block px-4 py-1.5 bg-smoke-800/40 text-smoke-500 font-sans text-xs tracking-widest uppercase rounded-sm border border-smoke-700">TBA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-14 aos">
+        <p class="font-body text-smoke-400 italic text-lg mb-6">We look forward to hosting you!</p>
+        <button onclick="showPage('contact')" class="btn-outline">Get Notified of New Events</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="font-display text-sm text-ember-light mb-2">Reviving Fire Ministries Int'l</div>
+      <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ BLOG ══════════════════ -->
+<section id="page-blog" class="page">
+
+  <div class="relative pt-36 pb-20 px-6 text-center overflow-hidden" style="background:linear-gradient(180deg,#1a0d05 0%,#0d0b08 100%)">
+    <div class="absolute inset-0 opacity-20" style="background:radial-gradient(ellipse at 50%,rgba(212,160,23,0.4),transparent 60%)"></div>
+    <div class="relative z-10">
+      <div class="section-tag mb-6">Morning Loaf & More</div>
+      <h1 class="font-display text-4xl sm:text-5xl text-gold-light gold-glow mb-4">Blog</h1>
+      <p class="font-body text-smoke-400 text-lg max-w-xl mx-auto">Daily devotionals, ministry announcements, and fresh encounters with God's Word.</p>
+    </div>
+  </div>
+
+  <!-- New Month Greeting Feature -->
+  <div class="py-16 px-6 bg-deep-mid">
+    <div class="max-w-4xl mx-auto">
+      <div class="fire-card p-10 relative overflow-hidden aos">
+        <div class="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-10" style="background:#d4a017; transform:translate(30%,-30%)"></div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="inline-block px-3 py-1 bg-gold/20 text-gold-light font-sans text-xs tracking-widest uppercase border border-gold/30">Featured</span>
+            <span class="font-sans text-xs text-smoke-600 tracking-widest">November 2025</span>
+          </div>
+          <h2 class="font-display text-2xl sm:text-3xl text-gold-light gold-glow mb-4 leading-tight">🌟 New Month Greeting — "Shining in His Light"</h2>
+          <div class="scripture-quote mb-6 text-smoke-300">
+            "The light shines in the darkness, and the darkness has not overcome it." — John 1:5 (NIV)
+          </div>
+          <p class="font-body text-smoke-400 text-lg leading-relaxed mb-4">
+            Beloved in Christ, welcome to a brand-new month! As we step into this season, the Lord reminds us of a timeless truth — His Light still shines! No matter how deep the darkness may seem around us, the Light of Christ remains constant, powerful, and victorious.
+          </p>
+          <p class="font-body text-smoke-500 text-base leading-relaxed">
+            In a world clouded by uncertainty, fear, and compromise, God calls His children to rise and shine (Isaiah 60:1). This month, let us Reflect His Glory, Resist the darkness, and Radiate His love to a hurting world.
+          </p>
+          <div class="mt-6 pt-6 border-t border-ember/10">
+            <p class="font-sans text-xs text-smoke-600 tracking-widest uppercase">— Reviving Fire Ministries Int'l 🔥</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Morning Loaf Devotionals -->
+  <div class="py-20 px-6 bg-deep-DEFAULT">
+    <div class="max-w-6xl mx-auto">
+      <div class="fire-divider mb-4">
+        <span class="section-tag">Morning Loaf Series</span>
+      </div>
+      <h2 class="font-display text-2xl text-center text-smoke-100 mb-14 aos">Daily Devotionals</h2>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Devotional cards from document -->
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(0)" style="transition-delay:0.05s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">2 Nov 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4 border-l-ember/50">Psalm 125:1</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built to Last Forever</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">Those who trust in the LORD are like Mount Zion, which cannot be moved, but abides forever. What God builds lasts.</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(1)" style="transition-delay:0.1s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">1 Nov 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">Matthew 5:14</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built for Impact</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">You are the light of the world. A city set on a hill cannot be hidden. You were not built to merely survive; you were built to shine!</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(2)" style="transition-delay:0.15s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">31 Oct 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">Proverbs 10:9</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built in Character</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">He who walks with integrity walks securely. Your gifts may open doors, but only character keeps them open.</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(3)" style="transition-delay:0.2s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">30 Oct 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">Isaiah 1:19</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built in Obedience</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">If you are willing and obedient, you shall eat the good of the land. Obedience is the secret strength of every lasting vessel.</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(4)" style="transition-delay:0.25s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">29 Oct 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">1 Peter 1:7</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built Through Fire</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">The genuineness of your faith, being much more precious than gold that perishes, though it is tested by fire...</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card aos" onclick="openDevotional(5)" style="transition-delay:0.3s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">28 Oct 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">Acts 20:32</div>
+          <h3 class="font-heading text-lg text-smoke-100 mb-3 blog-title transition-colors">Built by the Word</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed line-clamp-3">The word of His grace, which is able to build you up and give you an inheritance among all those who are sanctified.</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+
+        <div class="fire-card p-7 blog-card md:col-span-2 lg:col-span-3 aos" onclick="openDevotional(6)" style="transition-delay:0.35s">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-sans text-[0.6rem] text-ember tracking-widest uppercase">27 Oct 2025</span>
+          </div>
+          <div class="scripture-quote text-smoke-400 text-sm mb-4">Matthew 7:24–25</div>
+          <h3 class="font-heading text-xl text-smoke-100 mb-3 blog-title transition-colors">The Foundation That Stands</h3>
+          <p class="font-body text-smoke-500 text-base leading-relaxed">Every enduring structure begins with a solid foundation. In life, storms are inevitable — but the question is: WHAT ARE YOU BUILT ON? The believer who builds on Christ, the immovable Rock, will not collapse under adversity.</p>
+          <div class="mt-5 flex items-center gap-2 text-ember">
+            <span class="font-sans text-xs tracking-widest uppercase">Read more</span>
+            <span>→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Devotional Modal -->
+  <div id="devotional-modal" class="fixed inset-0 z-200 hidden items-center justify-center p-4" style="z-index:200">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDevotional()"></div>
+    <div id="modal-content" class="relative max-w-2xl w-full max-h-[85vh] overflow-y-auto fire-card p-10 animate-[fadeUp_0.4s_ease_forwards]">
+      <button onclick="closeDevotional()" class="absolute top-4 right-4 text-smoke-500 hover:text-ember text-2xl transition-colors">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="font-display text-sm text-ember-light mb-2">Reviving Fire Ministries Int'l</div>
+      <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ CONTACT ══════════════════ -->
+<section id="page-contact" class="page">
+
+  <div class="relative pt-36 pb-20 px-6 text-center overflow-hidden" style="background:linear-gradient(180deg,#1a0d05,#0d0b08)">
+    <div class="absolute inset-0 opacity-20" style="background:radial-gradient(ellipse at 50%,rgba(232,93,4,0.5),transparent 60%)"></div>
+    <div class="relative z-10">
+      <div class="section-tag mb-6">We'd Love To Hear From You</div>
+      <h1 class="font-display text-4xl sm:text-5xl text-ember-light glow-text mb-4">Get In Touch</h1>
+    </div>
+  </div>
+
+  <div class="py-20 px-6 bg-deep-DEFAULT">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-12">
+
+        <!-- Contact info -->
+        <div class="aos-left">
+          <h2 class="font-display text-2xl text-smoke-100 mb-10">Contact Information</h2>
+
+          <div class="space-y-8">
+            <div class="flex items-start gap-5">
+              <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-ember">✉</div>
+              <div>
+                <div class="section-tag mb-1">Email</div>
+                <a href="mailto:devinerevivalmandate@gmail.com" class="font-body text-smoke-200 text-lg hover:text-ember transition-colors">devinerevivalmandate@gmail.com</a>
+              </div>
+            </div>
+            <div class="flex items-start gap-5">
+              <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-ember">📞</div>
+              <div>
+                <div class="section-tag mb-1">Phone</div>
+                <a href="tel:+2348132084211" class="font-body text-smoke-200 text-lg hover:text-ember transition-colors">+234 813 208 4211</a>
+              </div>
+            </div>
+            <div class="flex items-start gap-5">
+              <div class="w-12 h-12 flex-shrink-0 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-ember">📍</div>
+              <div>
+                <div class="section-tag mb-1">Address</div>
+                <p class="font-body text-smoke-200 text-lg">Ibadan to the ends of the earth</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social -->
+          <div class="mt-12">
+            <div class="section-tag mb-6">We Are Social</div>
+            <div class="flex gap-4">
+              <a href="#" class="w-12 h-12 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-smoke-400 hover:text-ember hover:border-ember/50 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-smoke-400 hover:text-ember hover:border-ember/50 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-ember/15 border border-ember/20 flex items-center justify-center text-smoke-400 hover:text-ember hover:border-ember/50 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="aos-right">
+          <div class="fire-card p-8">
+            <h2 class="font-display text-2xl text-smoke-100 mb-8">Send A Message</h2>
+            <form id="contact-form" onsubmit="handleFormSubmit(event)" class="space-y-5">
+              <div>
+                <label class="font-sans text-xs text-smoke-500 tracking-widest uppercase block mb-2">Full Name</label>
+                <input type="text" placeholder="Your name" class="form-input" required />
+              </div>
+              <div>
+                <label class="font-sans text-xs text-smoke-500 tracking-widest uppercase block mb-2">Email</label>
+                <input type="email" placeholder="your@email.com" class="form-input" required />
+              </div>
+              <div>
+                <label class="font-sans text-xs text-smoke-500 tracking-widest uppercase block mb-2">Subject</label>
+                <input type="text" placeholder="How can we help?" class="form-input" />
+              </div>
+              <div>
+                <label class="font-sans text-xs text-smoke-500 tracking-widest uppercase block mb-2">Message</label>
+                <textarea placeholder="Your message..." rows="5" class="form-input resize-none" required></textarea>
+              </div>
+              <button type="submit" class="btn-fire w-full mt-2">Send Message</button>
+              <div id="form-success" class="hidden text-center font-body text-smoke-300 py-3 bg-ember/10 border border-ember/20">
+                ✓ Message sent! We'll be in touch soon.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="font-display text-sm text-ember-light mb-2">Reviving Fire Ministries Int'l</div>
+      <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ GIVE ══════════════════ -->
+<section id="page-give" class="page">
+
+  <div class="relative pt-36 pb-20 px-6 text-center overflow-hidden" style="background:linear-gradient(180deg,#1a1000,#0d0b08)">
+    <div class="absolute inset-0 opacity-20" style="background:radial-gradient(ellipse at 50%,rgba(212,160,23,0.6),transparent 60%)"></div>
+    <div class="relative z-10">
+      <div class="section-tag mb-6" style="color:#d4a017">Support The Mission</div>
+      <h1 class="font-display text-4xl sm:text-5xl text-gold-light gold-glow mb-4">Give</h1>
+      <p class="font-body text-smoke-400 text-lg max-w-xl mx-auto">Your generosity fuels revival and transforms lives across the nations.</p>
+    </div>
+  </div>
+
+  <!-- Why give -->
+  <div class="py-16 px-6 bg-deep-mid">
+    <div class="max-w-4xl mx-auto">
+      <div class="fire-divider mb-4">
+        <span class="section-tag" style="color:#d4a017">Your Impact</span>
+      </div>
+      <h2 class="font-display text-2xl text-center text-smoke-100 mb-12 aos">Your Generosity Helps Us</h2>
+
+      <div class="grid sm:grid-cols-3 gap-6">
+        <div class="text-center aos" style="transition-delay:0.1s">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl">🗺️</div>
+          <h3 class="font-heading text-smoke-100 mb-2">Organize Events</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed">Fund Night of Encounter programs across various regions and campuses.</p>
+        </div>
+        <div class="text-center aos" style="transition-delay:0.2s">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl">📽️</div>
+          <h3 class="font-heading text-smoke-100 mb-2">Produce Media</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed">Create content that reaches thousands across social media and digital platforms.</p>
+        </div>
+        <div class="text-center aos" style="transition-delay:0.3s">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-2xl">📖</div>
+          <h3 class="font-heading text-smoke-100 mb-2">Equip Ministers</h3>
+          <p class="font-body text-smoke-500 text-sm leading-relaxed">Train and equip individuals for effective ministry work in their communities.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank details -->
+  <div class="py-24 px-6 bg-deep-DEFAULT">
+    <div class="max-w-3xl mx-auto">
+      <div class="fire-divider mb-4">
+        <span class="section-tag" style="color:#d4a017">Ways To Give</span>
+      </div>
+      <h2 class="font-display text-2xl text-center text-smoke-100 mb-14 aos">Bank Transfer Details</h2>
+
+      <div class="space-y-8">
+        <!-- Local -->
+        <div class="account-card p-8 rounded-sm aos" style="transition-delay:0.1s">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:rgba(212,160,23,0.15); border:1px solid rgba(212,160,23,0.3)">🇳🇬</div>
+            <div>
+              <div class="font-sans text-[0.6rem] tracking-widest uppercase" style="color:#d4a017">Local Account</div>
+              <div class="font-heading text-smoke-200 text-sm">Nigeria — Naira (₦)</div>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-3 border-b border-smoke-800">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Bank</span>
+              <span class="font-heading text-smoke-200">United Bank for Africa (UBA)</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-smoke-800">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Account Number</span>
+              <div class="flex items-center gap-3">
+                <span class="font-heading text-smoke-100 tracking-wider text-lg" id="acct-local">2121386658</span>
+                <button onclick="copyText('2121386658','copy-local')" class="font-sans text-xs text-ember hover:text-ember-light transition-colors" id="copy-local">Copy</button>
+              </div>
+            </div>
+            <div class="flex justify-between items-center py-3">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Account Name</span>
+              <span class="font-heading text-smoke-200">TEGA OPEYEMI EDUVIERE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Domiciliary -->
+        <div class="account-card p-8 rounded-sm aos" style="transition-delay:0.2s">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:rgba(212,160,23,0.15); border:1px solid rgba(212,160,23,0.3)">💵</div>
+            <div>
+              <div class="font-sans text-[0.6rem] tracking-widest uppercase" style="color:#d4a017">Domiciliary Account</div>
+              <div class="font-heading text-smoke-200 text-sm">Dollar ($) Account</div>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-3 border-b border-smoke-800">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Bank</span>
+              <span class="font-heading text-smoke-200">United Bank for Africa (UBA)</span>
+            </div>
+            <div class="flex justify-between items-center py-3 border-b border-smoke-800">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Account Number</span>
+              <div class="flex items-center gap-3">
+                <span class="font-heading text-smoke-100 tracking-wider text-lg" id="acct-dom">2178191847</span>
+                <button onclick="copyText('2178191847','copy-dom')" class="font-sans text-xs text-ember hover:text-ember-light transition-colors" id="copy-dom">Copy</button>
+              </div>
+            </div>
+            <div class="flex justify-between items-center py-3">
+              <span class="font-sans text-xs text-smoke-600 tracking-widest uppercase">Account Name</span>
+              <span class="font-heading text-smoke-200">TEGA OPEYEMI EDUVIERE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thank you -->
+      <div class="text-center mt-16 aos">
+        <div class="inline-block p-8 rounded-sm" style="background:linear-gradient(135deg,rgba(212,160,23,0.08),rgba(13,11,8,0.9)); border:1px solid rgba(212,160,23,0.2)">
+          <div class="font-display text-xl text-gold-light gold-glow mb-3">Thank You</div>
+          <p class="font-body text-smoke-400 text-lg leading-relaxed">
+            Thank you for partnering with us to spread the revival fire! Your giving is sowing into eternity.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-12 px-6">
+    <div class="max-w-6xl mx-auto text-center">
+      <div class="font-display text-sm text-ember-light mb-2">Reviving Fire Ministries Int'l</div>
+      <div class="font-sans text-xs text-smoke-700">© 2025 · Powered by <span class="text-ember">Delight Tech</span></div>
+    </div>
+  </footer>
+</section>
+
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════ -->
+<script>
+// ─── Devotional data ───
+const devotionals = [
+  {
+    date: '2nd November, 2025',
+    topic: 'Built to Last Forever',
+    text: 'Psalm 125:1',
+    verse: '"Those who trust in the LORD are like Mount Zion, which cannot be moved, but abides forever."',
+    body: `What God builds lasts. When your trust is in Him, you cannot be shaken by times or trends.\n\nEmpires fade, systems fail, but those anchored in the Lord endure eternally.\n\nThe test of time bows to those who stand in FAITH. You are not just built to endure storms; you are built to outlive them!\n\nYour legacy in Christ will not die, it will echo through generations.`,
+    declarations: ['I am unmovable, unshakable, and unbreakable.','My life and destiny will stand the test of time.','I am built on eternal foundations.','My generation will remember my faith and work.','Today, I walk in perpetual strength, peace, and victory!']
+  },
+  {
+    date: '1st November, 2025',
+    topic: 'Built for Impact',
+    text: 'Matthew 5:14',
+    verse: '"You are the light of the world. A city set on a hill cannot be hidden."',
+    body: `You were not built to merely survive; you were actually built to shine!\n\nEvery process, every pruning, and every pain was God preparing you for visibility and influence.\n\nWhen God builds a man, He builds him for others — to strengthen, inspire, and illuminate lives.\n\nDon't hide your light because of fear or past wounds. You carry a divine assignment to impact generations.`,
+    declarations: ['I am a light to my generation.','My life brings hope and direction to others.','I rise and shine with excellence today.','My destiny is visible; my impact undeniable.','Today, I walk in relevance, power, and purpose!']
+  },
+  {
+    date: '31st October, 2025',
+    topic: 'Built in Character',
+    text: 'Proverbs 10:9',
+    verse: '"He who walks with integrity walks securely, But he who perverts his ways will become known."',
+    body: `Your gifts may open doors, but only character keeps them open. Enduring success is built on integrity, humility, and love.\n\nMany rise fast but fall faster because their inner man is weak. God is not in a hurry to promote a man He hasn't built in secret.\n\nLasting greatness is the reward of hidden discipline. If you want to stand the test of time, let God first build your heart.`,
+    declarations: ['My heart is pure, my motives are right.','I grow daily in integrity and wisdom.','My life reflects Christ in conduct and speech.','I refuse to compromise for convenience.','Today, I walk securely in divine favor and truth.']
+  },
+  {
+    date: '30th October, 2025',
+    topic: 'Built in Obedience',
+    text: 'Isaiah 1:19',
+    verse: '"If you are willing and obedient, you shall eat the good of the land."',
+    body: `Obedience is the secret strength of every lasting vessel. The greatest downfall of many is partial obedience.\n\nYou cannot stand the test of time walking contrary to divine instruction. Every instruction you obey builds a layer of divine fortification around your life.\n\nAbraham stood the test because he obeyed without argument. True stability is birthed when submission to God outweighs personal opinion.`,
+    declarations: ['Today, I receive the grace to obey promptly.','My heart is yielded to God\'s will.','I will not rebel against divine direction.','My obedience will open doors of favor.','I walk in divine stability and supernatural success today!']
+  },
+  {
+    date: '29th October, 2025',
+    topic: 'Built Through Fire',
+    text: '1 Peter 1:7',
+    verse: '"That the genuineness of your faith, being much more precious than gold that perishes, though it is tested by fire, may be found to praise, honor, and glory at the revelation of Jesus Christ."',
+    body: `Fire doesn't destroy gold — it purifies it. Likewise, every trial that comes your way is not to break you but to refine you.\n\nGod uses pressure to prove authenticity.\n\nThe people who stand the test of time are those who let the fire process them, not consume them.\n\nTHE HOTTER THE FIRE, THE PURER THE VESSEL.\n\nYou are being built through what you're going through. Don't despise your process — it's producing glory in you!`,
+    declarations: ['Today, I will not break under pressure.','Every trial is refining me for glory.','I emerge stronger, purer, and wiser.','Today, I receive grace to endure and shine.','My story will bring glory to God!']
+  },
+  {
+    date: '28th October, 2025',
+    topic: 'Built by the Word',
+    text: 'Acts 20:32',
+    verse: '"So now, brethren, I commend you to God and to the word of His grace, which is able to build you up and give you an inheritance among all those who are sanctified."',
+    body: `The Word of God is the spiritual cement of destiny. It molds, corrects, and strengthens you until you become unshakable.\n\nYou are not built by experience or emotion, but by consistent exposure to God's Word.\n\nEvery time you feed on the Scripture, something eternal is constructed within you.\n\nDon't neglect the Word and expect to stand when trials come. The Word you obey becomes your wall of defense.`,
+    declarations: ['The Word of God is working in me mightily.','My spirit is built and strengthened for greatness.','I receive divine instructions for today.','No circumstance will dominate me; I dominate by truth.','Today, I walk in divine wisdom and stability.']
+  },
+  {
+    date: '27th October, 2025',
+    topic: 'The Foundation That Stands',
+    text: 'Matthew 7:24–25',
+    verse: '"Whoever hears these sayings of Mine, and does them, I will liken him to a wise man who built his house on the rock: and the rain descended, the floods came, and the winds blew and beat on that house; and it did not fall, for it was founded on the rock."',
+    body: `Every enduring structure begins with a solid foundation. In life, storms are inevitable — pressure, betrayal, delay, disappointment, failure — but the question is: WHAT ARE YOU BUILT ON?\n\nThe believer who builds on Christ, the immovable Rock, will not collapse under adversity.\n\nWhen your convictions, values, and identity are anchored in GOD'S WORD, no wind can uproot you.\n\nThe test of time reveals what was truly built by FAITH.`,
+    declarations: ['Today, I am rooted in Christ, the Solid Rock.','No storm of life will shake me.','My foundation will not fail; my faith will not sink.','I stand unmovable in the truth of God\'s Word.','Today, I manifest divine stability and strength everywhere I go.']
+  }
+];
+
+// ─── Page routing ───
+function showPage(pageId) {
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+
+  const target = document.getElementById('page-' + pageId);
+  if (target) {
+    target.style.display = 'block';
+    setTimeout(() => target.classList.add('active'), 10);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Update nav active state
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const activeLink = document.getElementById('nav-' + pageId);
+  if (activeLink) activeLink.classList.add('active');
+
+  // Trigger AOS on new page
+  setTimeout(observeAOS, 100);
+}
+
+// ─── Mobile menu ───
+function toggleMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('menu-overlay');
+  menu.classList.toggle('open');
+  overlay.classList.toggle('hidden');
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('menu-overlay').classList.add('hidden');
+}
+
+// ─── Scroll nav ───
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ─── AOS Observer ───
+function observeAOS() {
+  const els = document.querySelectorAll('.aos, .aos-left, .aos-right, .aos-scale');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => obs.observe(el));
+}
+observeAOS();
+
+// ─── Devotional modal ───
+function openDevotional(idx) {
+  const d = devotionals[idx];
+  const modal = document.getElementById('devotional-modal');
+  document.getElementById('modal-body').innerHTML = `
+    <div class="section-tag mb-3">${d.date}</div>
+    <div class="scripture-quote text-smoke-400 text-sm mb-4">${d.text}</div>
+    <h2 class="font-display text-2xl text-ember-light glow-text mb-6">${d.topic}</h2>
+    <div class="scripture-quote text-smoke-200 text-base mb-8 leading-relaxed">${d.verse}</div>
+    <div class="font-body text-smoke-300 text-lg leading-relaxed mb-8 whitespace-pre-line">${d.body}</div>
+    <div class="pt-6 border-t border-ember/20">
+      <div class="section-tag mb-4">Prophetic Declarations</div>
+      <ul class="space-y-3">
+        ${d.declarations.map(dec => `<li class="flex items-start gap-2 font-body text-smoke-300"><span class="text-ember mt-1 flex-shrink-0">→</span>${dec}</li>`).join('')}
+      </ul>
+      <p class="font-heading text-ember text-sm tracking-widest mt-6">IN THE NAME OF JESUS! AMEN</p>
+      <p class="font-sans text-smoke-600 text-xs tracking-wider mt-2">— Pastor Tega Eduviere</p>
+    </div>
+  `;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeDevotional() {
+  document.getElementById('devotional-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ─── Copy account number ───
+function copyText(text, btnId) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = 'Copied!';
+    btn.style.color = '#22c55e';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+  });
+}
+
+// ─── Form submit ───
+function handleFormSubmit(e) {
+  e.preventDefault();
+  document.getElementById('form-success').classList.remove('hidden');
+  e.target.reset();
+  setTimeout(() => document.getElementById('form-success').classList.add('hidden'), 5000);
+}
+
+// ─── Ember particles ───
+function spawnEmber() {
+  const container = document.getElementById('ember-container');
+  if (!container) return;
+  const ember = document.createElement('div');
+  ember.className = 'ember';
+  const x = Math.random() * 100;
+  const duration = 3 + Math.random() * 4;
+  const size = 2 + Math.random() * 4;
+  const drift = (Math.random() - 0.5) * 80;
+  ember.style.cssText = `
+    left:${x}%;
+    bottom:0;
+    width:${size}px;
+    height:${size}px;
+    --drift:${drift}px;
+    animation-duration:${duration}s;
+    animation-delay:${Math.random() * 2}s;
+    background:${Math.random() > 0.5 ? '#f48c06' : '#fde68a'};
+    box-shadow:0 0 ${size * 2}px ${Math.random() > 0.5 ? '#f48c06' : '#e85d04'};
+  `;
+  container.appendChild(ember);
+  setTimeout(() => ember.remove(), duration * 1000 + 2000);
+}
+setInterval(spawnEmber, 400);
+
+// ─── Fire canvas background ───
+(function() {
+  const canvas = document.getElementById('fire-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = [];
+  function Particle() {
+    this.reset();
+  }
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * w;
+    this.y = h + 10;
+    this.vx = (Math.random() - 0.5) * 1.5;
+    this.vy = -(1 + Math.random() * 3);
+    this.life = 1;
+    this.decay = 0.005 + Math.random() * 0.01;
+    this.size = 3 + Math.random() * 8;
+  };
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+    this.vx += (Math.random() - 0.5) * 0.2;
+    if (this.life <= 0) this.reset();
+  };
+  Particle.prototype.draw = function() {
+    const alpha = this.life;
+    const r = Math.floor(232 + (244-232)*alpha);
+    const g = Math.floor(93 + (140-93)*alpha);
+    const b = 4;
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.6;
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = `rgba(${r},${g},${b},0.8)`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  };
+
+  for (let i = 0; i < 60; i++) {
+    const p = new Particle();
+    p.y = Math.random() * h;
+    p.life = Math.random();
+    particles.push(p);
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ─── Initialize ───
+showPage('home');
+</script>
+</body>
+</html>
